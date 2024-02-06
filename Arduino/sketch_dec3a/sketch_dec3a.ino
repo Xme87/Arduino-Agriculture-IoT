@@ -10,7 +10,7 @@
 
 DHT dht(DHTPIN, DHTTYPE);
  
-// 设置wifi接入信息(请根据您的WiFi信息进行修改)
+// 设置wifi接入信息　WIFIを設置
 const char* ssid = "aterm-c00a9d-g";
 const char* password = "8d521cf161df5";
 const char* mqttServer = "192.168.10.113";
@@ -20,36 +20,34 @@ WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
  
 
-const char* mqttUserName = "admin";         // 服务端连接用户名(需要修改)
-const char* mqttPassword = "mosquitto";          // 服务端连接密码(需要修改)
-const char* clientId = "arduino_1";          // 客户端id (需要修改)
-const char* subTopic = "IoT for soil";        // 订阅主题(需要修改)
-const char* pubTopic1 = "Soil Humidity";
+const char* mqttUserName = "admin";         // 服务端连接用户名　サーバーユーザー
+const char* mqttPassword = "mosquitto";          // 服务端连接密码　サーバーパスワード
+const char* clientId = "arduino_1";          // 客户端id　クライアントユーザー
+const char* subTopic = "IoT for soil";        // 订阅主题　サブトピック
+const char* pubTopic1 = "Soil Humidity";        // 发布主题　パブトピック
 const char* pubTopic2 = "Air Humidity";
-const char* pubTopic3 = "Air Temperature";        // 发布主题(需要修改)
-const char* willTopic = "about to offline";   // 遗嘱主题名称  这是指，离线前最后一句话
+const char* pubTopic3 = "Air Temperature";        　
+const char* willTopic = "about to offline";   // 遗嘱主题名称  遺言検認トピック
 // ****************************************************
  
 //遗嘱相关信息
-const char* willMsg = "esp8266 offline";        // 遗嘱主题信息
-const int willQos = 0;                          // 遗嘱QoS
-const int willRetain = false;                   // 遗嘱保留
+const char* willMsg = "esp8266 offline";        // 遗嘱主题信息　遺言検認情報
+const int willQos = 0;                          // 遗嘱QoS　遺言Qos
+const int willRetain = false;                   // 遗嘱保留　遺言保存
  
 const int subQoS = 1;           
 const bool cleanSession = false; 
  
 bool SensorStatus = LOW;
 
-const long interval = 6000;  // 发送间隔，单位：毫秒（这里设置为一分钟）
+const long interval = 3600000;  // 发送间隔（毫秒）　発信間隔(ms)
 
 unsigned long previousMillis = 0;
  
-// 连接MQTT服务器并订阅信息
+// 连接MQTT服务器并订阅信息　MQTTサーバーを接続、トピックをサブスクライブ
 void connectMQTTserver(){
-  // 根据ESP8266的MAC地址生成客户端ID（避免与其它ESP8266的客户端ID重名）
-  
- 
-  /* 连接MQTT服务器
+
+  /* 连接MQTT服务器 MQTTサーバーを接続
   boolean connect(const char* id, const char* user, 
                   const char* pass, const char* willTopic, 
                   uint8_t willQos, boolean willRetain, 
@@ -66,7 +64,7 @@ void connectMQTTserver(){
     Serial.print("MQTT Server: ");
     Serial.println(mqttServer);    
     
-    subscribeTopic(); // 订阅指定主题
+    subscribeTopic(); // 订阅指定主题 トピックをサブスクライブ
   } else {
     Serial.print("MQTT Server Connect Failed. Client State:");
     Serial.println(mqttClient.state());
@@ -74,7 +72,7 @@ void connectMQTTserver(){
   }   
 }
  
-// 收到信息后的回调函数
+// 收到信息后的回调函数　コールバック関数
 void receiveCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message Received [");
   Serial.print(topic);
@@ -86,19 +84,19 @@ void receiveCallback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message Length(Bytes) ");
   Serial.println(length);
  
-  if ((char)payload[0] == '1') {     // 如果收到的信息以“1”为开始
+  if ((char)payload[0] == '1') {     // 如果收到的信息以“1”为开始　コールバックメッセージは"1"から
     SensorStatus = HIGH;
-    digitalWrite(A0, SensorStatus);  // 则开启传感器。
+    digitalWrite(A0, SensorStatus);  // 则开启传感器　センサーを起動
   } 
-  if ((char)payload[0] == '2') {     // 如果收到的信息以“2”为开始
+  if ((char)payload[0] == '2') {     // 如果收到的信息以“2”为开始　コールバックメッセージは"2"から
     SensorStatus = LOW;                           
-    digitalWrite(A0, SensorStatus); // 则关闭传感器。
+    digitalWrite(A0, SensorStatus); // 则关闭传感器　センサーを閉じる
   }
  
   pubMQTTmsg();
 }
  
-// 订阅指定主题
+// 订阅指定主题　トピックをサブスクライブ
 void subscribeTopic(){
  
   
@@ -111,7 +109,7 @@ void subscribeTopic(){
   }  
 }
  
-// 发布信息
+// 发布信息　メッセージを発信
 void pubMQTTmsg(){
   char* pubMessage1;
   char* pubMessage2;
@@ -139,33 +137,33 @@ void pubMQTTmsg(){
     pubMessage1 = itc;
   }*/
 
-  // 实现ESP8266向主题发布信息
+  // 实现ESP8266向主题发布信息　ESP8266からトピックへのメッセージ転送
   if(mqttClient.publish(pubTopic1, pubMessage1)){
     Serial.println("Publish Topic:");Serial.println(pubTopic1);
-    Serial.println("Publish message:");Serial.print(pubMessage1);    
+    Serial.println("Publish message:");Serial.print(pubMessage1);    //土壤湿度 土壌湿度
   } else {
     Serial.println("Soil Humidity Publish Failed."); 
   }
     if(mqttClient.publish(pubTopic2, pubMessage2)){
     Serial.println("Publish Topic:");Serial.println(pubTopic2);
-    Serial.println("Publish message:");Serial.print(pubMessage2);    
+    Serial.println("Publish message:");Serial.print(pubMessage2);    //空气湿度 空気湿度
   } else {
     Serial.println("Air Humidity Publish Failed."); 
   }
     if(mqttClient.publish(pubTopic3, pubMessage3)){
     Serial.println("Publish Topic:");Serial.println(pubTopic3);
-    Serial.println("Publish message:");Serial.print(pubMessage3);    
+    Serial.println("Publish message:");Serial.print(pubMessage3);    //空气温度 空気温度
   } else {
     Serial.println("Air Temperature Publish Failed."); 
   }
 }
  
-// ESP8266连接wifi
+// ESP8266连接wifi　ESP8266がWIFIを接続
 void connectWifi(){
  
   WiFi.begin(ssid, password);
  
-  //等待WiFi连接,成功连接后输出成功信息
+  //等待WiFi连接,成功连接后输出成功信息　接続したらメッセージする
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
@@ -181,27 +179,27 @@ void setup() {
   dht.begin();  
   Serial.begin(57600);                   
   
-  //设置ESP8266工作模式为无线终端模式
+  //设置ESP8266工作模式为无线终端模式　WIFIモードを設定
   WiFi.mode(WIFI_STA);
   
   // 连接WiFi
   connectWifi();
   
-  // 设置MQTT服务器和端口号
+  // 设置MQTT服务器和端口号　MQTTサーバー情報の設定
   mqttClient.setServer(mqttServer, mqttPort);
   mqttClient.setCallback(receiveCallback);
  
-  // 连接MQTT服务器
+  // 连接MQTT服务器　MQTTサーバーへの接続
   connectMQTTserver();
 }
  
 void loop() {
-  // 如果开发板未能成功连接服务器，则尝试连接服务器
+  // 如果开发板未能成功连接服务器，则尝试连接服务器　もし接続できないなら、続けて試してみる
   if (!mqttClient.connected()) {
     connectMQTTserver();
   }
  
-   // 处理信息以及心跳
+   // 处理信息以及心跳　メッセージを対応
    mqttClient.loop();
     
   Serial.print("Soil Humidity:");
@@ -217,12 +215,12 @@ void loop() {
 
   unsigned long currentMillis = millis();
 
-  // 判断是否到达发送间隔
+  // 判断是否到达发送间隔　発信間隔の判断
   if (currentMillis - previousMillis >= interval) {
-    // 保存最后一次发送的时间
+    // 保存最后一次发送的时间　最後の発信時間を保存
     previousMillis = currentMillis;
 
-    // 发送 MQTT 消息
+    // 发送 MQTT 消息　MQTTメッセージを発信
     pubMQTTmsg();
   }
 }
