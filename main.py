@@ -14,7 +14,7 @@ file_path = {'Soil Humidity': 'Soil Humidity.csv',
              'Air Temperature': 'Air Temperature.csv'}
 
 lock = threading.Lock()
-data_ready = threading.Event()  # 用于通知绘图线程何时开始绘图
+data_ready = threading.Event()  # 用于通知绘图线程何时开始绘图　図の作成を開始
 
 client = mqtt.Client()
 received_data = {'Soil Humidity': [], 'Air Humidity': [], 'Air Temperature': []}
@@ -33,7 +33,7 @@ def on_message(client, userdata, message):
         received_value = float(received_message)
         received_data[topic].append([timestamp, received_value])
 
-        # 通知绘图线程开始绘图
+        # 通知绘图线程开始绘图　図の作成開始
         data_ready.set()
 
 print('Detection Start.')
@@ -47,18 +47,18 @@ client.loop_start()
 
 def plot_chart(topic):
     while True:
-        # 等待数据就绪
+        # 等待数据就绪　データを待つ
         data_ready.wait()
 
         with lock:
-            # 按照时间戳对数据进行排序
+            # 按照时间戳对数据进行排序　データを時間より排列
             sorted_data = sorted(received_data[topic], key=lambda x: x[0])
 
-            # 获取排序后的时间戳和消息
+            # 获取排序后的时间戳和消息　時間とメッセージを取る
             timestamps = [entry[0] for entry in sorted_data]
             messages = [entry[1] for entry in sorted_data]
 
-            # 绘制图表
+            # 绘制图表　図を作成
             plt.figure(figsize=(10, 6))
             plt.plot(timestamps, messages, label=f'{topic}', marker='o')
             plt.title(f'{topic}')
@@ -86,11 +86,11 @@ try:
         pass
 
 except KeyboardInterrupt:
-    # 用户按下 Ctrl+C 时执行
+    # threading開始
     threading.Thread(target=plot_chart, args=('Soil Humidity',), daemon=True).start()
     threading.Thread(target=plot_chart, args=('Air Humidity',), daemon=True).start()
     threading.Thread(target=plot_chart, args=('Air Temperature',), daemon=True).start()
 
-    data_ready.set()  # 通知绘图线程开始绘图
+    data_ready.set()
     client.loop_stop()
     client.disconnect()
