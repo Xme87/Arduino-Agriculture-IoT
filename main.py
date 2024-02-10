@@ -68,7 +68,7 @@ def send_line_image(notification_image, topic):
     line_notify_api = "https://notify-api.line.me/api/notify"
 
     # payload・httpヘッダー設定
-    payload = {'message': f'{topic} charts'}
+    payload = {'message': f'{topic} chart'}
     headers = {'Authorization': 'Bearer ' + line_notify_token}
 
     # 送信画像設定
