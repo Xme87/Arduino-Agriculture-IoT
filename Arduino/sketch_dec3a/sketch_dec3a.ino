@@ -11,9 +11,9 @@
 DHT dht(DHTPIN, DHTTYPE);
  
 // 设置wifi接入信息　WIFIを設置
-const char* ssid = "aterm-c00a9d-g";
-const char* password = "8d521cf161df5";
-const char* mqttServer = "192.168.10.113";
+const char* ssid = "##########";
+const char* password = "##########";
+const char* mqttServer = "###.###.###.###";
 const int mqttPort = 7788;
  
 WiFiClient wifiClient;
