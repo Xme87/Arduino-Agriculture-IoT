@@ -55,7 +55,7 @@ def on_message(client, userdata, message):
 
 # LINE Notify による通知
 def send_line_notify(notification_message, topic):
-    line_notify_token = "#######################"
+    line_notify_token = ***************************
     line_notify_api = "https://notify-api.line.me/api/notify"
 
     # httpヘッダー設定
@@ -64,7 +64,7 @@ def send_line_notify(notification_message, topic):
     requests.post(line_notify_api, headers = headers, data = data)
 
 def send_line_image(notification_image, topic):
-    line_notify_token = "#######################"
+    line_notify_token = ***************************
     line_notify_api = "https://notify-api.line.me/api/notify"
 
     # payload・httpヘッダー設定
